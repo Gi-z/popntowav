@@ -1,5 +1,5 @@
 # popntowav
-Tool for rendering pop'n music IFS/chart files to 16-bit PCM wav.
+Tool for rendering pop'n music IFS/chart files to 32-bit PCM wav.
 
 ## Dependencies
 
