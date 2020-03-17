@@ -1,3 +1,8 @@
+//This is adapted from https://github.com/Snack-X/node-ms-adpcm
+//I tried to find a fast decoder for MSADPCM in nodejs and came up short.
+//Maybe I didn't look hard enough.
+//With some work, this did the job well for me.
+
 const ADAPTATION_TABLE = [
   230, 230, 230, 230, 307, 409, 512, 614,
   768, 614, 512, 409, 307, 230, 230, 230,

@@ -40,8 +40,11 @@ const channels = 2;
 const samplingRate = 44100;
 //Because Int32.    
 const bytes = 4;
-let lowestVolume = 100;
 
+//After loading in all the keysounds, we need to find ones that
+//aren't 44.1KHz, since they'll mess everything up.
+//Best resampling option I could find was node-libsamplerate.
+//I'm sure other people have better suggestions.
 for (var i = 0; i<decodedKeysounds.length; i++) {
     let keysound = decodedKeysounds[i];
     if (keysound.samplingRate != samplingRate) {
@@ -58,7 +61,6 @@ for (var i = 0; i<decodedKeysounds.length; i++) {
         resample.write(keysound.data);
         keysound.data = Buffer.from(resample.read());
     }
-    lowestVolume = keysound.volume < lowestVolume ? keysound.volume : lowestVolume;
     decodedKeysounds[i] = keysound;
 }
 
@@ -82,8 +84,7 @@ for (const event of chart.playEvents) {
 //This is overcompensating to deal with overflow from digital summing.
 //Final Timestamp in milliseconds * sampling rate * 2 channels * 4 bytes.
 const finalBuffer = Buffer.alloc(buffSize);
-
-chart.playEvents.forEach((event) => {
+for (const event of chart.playEvents) {
     const [offset, keysoundNo] = event;
     //Grabbing the relevant offset for the buffer.
     const convertedOffset = parseInt((offset*samplingRate)/1000)*channels*bytes;
@@ -100,12 +101,12 @@ chart.playEvents.forEach((event) => {
             finalBuffer.writeInt32LE(mixedBytes, convertedOffset+(i*2));
         }
     }
-});
+}
 
-//We've got summed 16bit values, but they need normalising so we can hear them,
-//from a 32bit buffer.
+//We've got summed 16bit values, which means they won't fit into a 16bit buffer.
+//We also can't just shove them into a 32bit buffer, since they're 16bit scale.
+//Instead, we'll have to normalise them first using the peak observed volume.
 //2147483647 is just so I don't have to import a MAX_INT32 module.
-//We're normaslising against the highest volume seen.
 //After normalising, these values will be scaled correctly from 16bit to 32bit.
 const normaliseFactor = parseInt(2147483647/highestSample);
 for (var i = 0; i<finalBuffer.length; i += 4) {
@@ -117,5 +118,6 @@ for (var i = 0; i<finalBuffer.length; i += 4) {
 let filename = soundContainer.name;
 filename = filename.slice(0, filename.indexOf("\u0000"));
 
+//I could manually generate a wav header, but I don't because I'm lazy.
 let writer = new wav.FileWriter("output\\"+outputFilename+".wav", {bitDepth: 32});
 writer.write(finalBuffer);
