@@ -1,7 +1,7 @@
 {
   "name": "popntowav",
   "version": "1.0.0",
-  "description": "Tool for rendering pop'n music IFS/chart files to 16-bit PCM wav.",
+  "description": "Tool for rendering pop'n music IFS/chart files to 32-bit PCM wav.",
   "main": "popntowav.js",
   "dependencies": {
     "node-libsamplerate": "^1.0.0",
