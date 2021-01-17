@@ -19,4 +19,4 @@ Thanks to [Emi](https://github.com/EmiMidnight) and though for help with this no
 
 ## License
 
-Yar har. Just think of me if you want to use this. Maybe even write my name down on a piece of paper somewhere.
+Yar har.
